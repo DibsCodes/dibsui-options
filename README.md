@@ -24,6 +24,7 @@ DibsUIOptions:RegisterModule({
 	addon = "MyAddonFolder",   -- for the version shown on the Options > AddOns page
 	title = "My Module",       -- heading over your tabs when more than one addon is installed
 	order = 20,                -- where your tabs go (DibsUI is 10)
+	slash = "mymodule",        -- optional: /dui mymodule opens the window on your first tab
 	cleanProfile = function(settings) return settings end, -- fill in defaults, fix bad values
 	tabs = {
 		{ label = "My Tab", build = function(content, context, relayout)
@@ -43,13 +44,14 @@ Other calls:
 
 | Call | Does |
 |---|---|
-| `DibsUIOptions.version` | API version, `1` now |
+| `DibsUIOptions.version` | API version, `2` now. Check it before using a call added after `1` |
 | `DibsUIOptions.Widgets` | The controls and page layout the settings pages use (toggle rows, sliders, dropdowns, cards, flow layout, scroll page, color swatch, font menu, panels). See `Widgets.lua` for the list at the end |
 | `:Open(moduleKey, tabLabel)` / `:Toggle()` | Open the window, on a module's tab |
 | `:IsLocked()` / `:SetLocked(locked)` / `:NotifyLockChanged()` | Every module's frame lock |
 | `:GetProfileName()`, `:GetProfileNames()`, `:UseProfile(name)`, `:CreateProfile(name, copyFrom)`, `:DeleteProfile(name)` | Profiles |
 | `:ImportOnce(key, { profiles, characters, account, minimap, window })` | Bring a module's settings from before DibsUI-Options in, once |
 | `:Print(message)` | Chat message with the DibsUI prefix |
+| `:RegisterCallback(event, func)` / `:Fire(event, ...)` | Messages between modules (version 2). `"SettingsChanged", moduleKey` fires after a module changes a setting others follow, such as DibsUI's font and last names |
 
 The addons update separately, so keep old calls working when changing this API, and bump `version`.
 

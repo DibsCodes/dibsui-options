@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.0
+
+- `/dui` followed by an addon's word opens the settings on its tab, such as `/dui party` for DibsUI-Party. Any other word lists the commands
+- For addon authors: `RegisterCallback` and `Fire`, so DibsUI addons can follow each other's settings, and a `slash` word for the module. DibsUI-Party uses them to follow DibsUI's font and last names. API version 2
+
 ## 0.1.0
 
 - First version: the settings window, profiles, minimap button, `/dibsui` and the Options > AddOns page,

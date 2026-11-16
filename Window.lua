@@ -498,16 +498,36 @@ local function ToggleLocked()
 	end
 end
 
--- /dibsui opens or closes the settings, and /dibsui lock locks or unlocks the frames.
+local function PrintCommands()
+	local list = { "/dui opens or closes the settings", "/dui lock locks or unlocks the frames" }
+	for _, module in ipairs(ns.GetModules()) do
+		if module.slash then
+			list[#list + 1] = "/dui " .. module.slash .. " opens " .. (module.title or module.key) .. "'s settings"
+		end
+	end
+	ns.Print(table.concat(list, ", ") .. ".")
+end
+
+-- /dibsui opens or closes the settings, /dibsui lock locks or unlocks the frames, and a module's word
+-- (its slash, such as "party") opens the window on that module's tab.
 SLASH_DIBSUI1 = "/dibsui"
 SLASH_DIBSUI2 = "/dui"
 SlashCmdList.DIBSUI = function(message)
 	local command = (message or ""):match("^%s*(.-)%s*$"):lower()
-	if command == "lock" then
-		ToggleLocked()
-	else
+	if command == "" then
 		ns.ToggleConfig()
+		return
+	elseif command == "lock" then
+		ToggleLocked()
+		return
 	end
+	for _, module in ipairs(ns.GetModules()) do
+		if module.slash and module.slash:lower() == command then
+			api:Open(module.key)
+			return
+		end
+	end
+	PrintCommands()
 end
 
 -- The game's own settings ------------------------------------------------------------------------

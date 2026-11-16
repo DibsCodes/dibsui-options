@@ -36,7 +36,7 @@ local ACCOUNT_DEFAULTS = {
 
 -- The public API, as the global DibsUIOptions. Bump API_VERSION when something here changes in a way
 -- a module could notice, and keep old functions working where possible: the addons update separately.
-local API_VERSION = 1
+local API_VERSION = 2 -- 2: RegisterCallback, Fire
 local api = { version = API_VERSION }
 DibsUIOptions = api
 ns.api = api
@@ -116,6 +116,7 @@ end
 --   key = "DibsUI",                 -- unique, also the key of its settings in each profile
 --   title = "DibsUI",               -- shown in the window
 --   order = 10,                     -- tabs are grouped by module in this order
+--   slash = "party",                -- optional: /dui party opens the window on this module's tab
 --   cleanProfile = function(settings) return settings end, -- fills defaults, fixes bad values
 --   tabs = { { label = "General", build = function(content, context, relayout) return options end }, ... },
 --   onProfileChanged = function(settings) end, -- after the character switches profile (never in combat)
@@ -349,6 +350,28 @@ end
 
 function api:Print(message)
 	ns.Print(message)
+end
+
+-- Callbacks ---------------------------------------------------------------------------------------
+
+-- Lets modules tell each other about changes. The one in use so far: "SettingsChanged" with a module
+-- key, fired after that module changes a setting other modules follow (DibsUI's master font and last
+-- names). A callback's error is reported without stopping the others.
+local callbacks = {}
+
+function api:RegisterCallback(event, callback)
+	assert(type(event) == "string" and type(callback) == "function", "RegisterCallback needs an event and a function")
+	callbacks[event] = callbacks[event] or {}
+	table.insert(callbacks[event], callback)
+end
+
+function api:Fire(event, ...)
+	for _, callback in ipairs(callbacks[event] or {}) do
+		local ok, err = pcall(callback, ...)
+		if not ok then
+			geterrorhandler()(err)
+		end
+	end
 end
 
 -- Startup -----------------------------------------------------------------------------------------
