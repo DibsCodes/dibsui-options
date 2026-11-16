@@ -1,7 +1,7 @@
 ## Interface: 16001
 ## Title: DibsUI-Options
 ## Author: Dibs
-## Version: 0.2.0
+## Version: 0.2.1
 ## Notes: Settings window, profiles and minimap button shared by the DibsUI addons.
 ## SavedVariables: DibsUIOptionsDB
 ## IconTexture: Interface\AddOns\DibsUI-Options\Media\MinimapIcon

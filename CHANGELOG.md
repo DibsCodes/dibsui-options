@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.1
+
+- No changes in the game. Released again with DibsUI 0.3.2 and DibsUI-Party 0.1.1 so the suite's betas line up
+
 ## 0.2.0
 
 - `/dui` followed by an addon's word opens the settings on its tab, such as `/dui party` for DibsUI-Party. Any other word lists the commands
