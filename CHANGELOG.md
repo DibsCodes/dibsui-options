@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.2
+
+- First full release, no longer a beta, so the CurseForge app installs it along with DibsUI. No changes in the game
+
 ## 0.2.1
 
 - No changes in the game. Released again with DibsUI 0.3.2 and DibsUI-Party 0.1.1 so the suite's betas line up
