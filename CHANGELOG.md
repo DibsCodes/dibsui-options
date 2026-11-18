@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.3
+
+- "DibsUI" sits on its own plate across the top of the settings window, with Dibs in shaman blue and UI in gold
+- The window's gold headings, tab names, buttons and switches are a slightly softer gold
+- Comes with Barlow Semi Condensed Bold for the title
+
 ## 0.2.2
 
 - First full release, no longer a beta, so the CurseForge app installs it along with DibsUI. No changes in the game

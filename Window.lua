@@ -281,7 +281,7 @@ local function CreateNavButton(parent, text)
 	function button:SetSelected(isSelected)
 		selected:SetShown(isSelected)
 		bar:SetShown(isSelected)
-		label:SetFontObject(isSelected and "GameFontHighlight" or "GameFontNormal")
+		label:SetFontObject(isSelected and "GameFontHighlight" or "DibsUIOptionsFontNormal")
 	end
 	button:SetSelected(false)
 	return button
@@ -307,10 +307,65 @@ local function GetTabs()
 	return tabs
 end
 
+-- "DibsUI" on its own plate across the window's top edge, in the bars' style: slanted ends and a silver
+-- and gold double border (TitlePlate, from generate_art.py). The plate's art is 128 x 40 units, cut
+-- into a left end, a middle band that stretches to fit the name, and a right end.
+local PLATE_SCALE = 1.1
+local PLATE_ART_WIDTH = 128
+local PLATE_END = 20 -- units at each end holding the slant and border
+local PLATE_PADDING = 8 -- between the name and the ends
+local PLATE_SIZE = 1.05 -- the plate's scale on the window
+
+local function CreateTitlePlate(frame)
+	local titleText = frame.TitleContainer and frame.TitleContainer.TitleText or frame.TitleText
+	if titleText then
+		titleText:SetText("")
+		titleText:Hide()
+	end
+
+	local plate = CreateFrame("Frame", nil, frame)
+	-- Above the window's border, which the template draws well above the window itself. The border only
+	-- reaches its level after the window is made, so this is set each time the window shows.
+	local function Raise()
+		plate:SetFrameLevel((frame.NineSlice or frame):GetFrameLevel() + 20)
+	end
+	Raise()
+	frame:HookScript("OnShow", Raise)
+	local endWidth, height = PLATE_END * PLATE_SCALE, 40 * PLATE_SCALE
+
+	local function Slice(u0, u1)
+		local slice = ns.CreateArt(plate, "ARTWORK", "TitlePlate")
+		slice:SetTexCoord(u0 / PLATE_ART_WIDTH, u1 / PLATE_ART_WIDTH, 0, 1)
+		slice:SetHeight(height)
+		return slice
+	end
+	local left = Slice(0, PLATE_END)
+	left:SetWidth(endWidth)
+	left:SetPoint("TOPLEFT")
+	local right = Slice(PLATE_ART_WIDTH - PLATE_END, PLATE_ART_WIDTH)
+	right:SetWidth(endWidth)
+	right:SetPoint("TOPRIGHT")
+	local middle = Slice(PLATE_END, PLATE_END + 4)
+	middle:SetPoint("TOPLEFT", left, "TOPRIGHT")
+	middle:SetPoint("BOTTOMRIGHT", right, "BOTTOMLEFT")
+
+	local name = plate:CreateFontString(nil, "OVERLAY")
+	W.StyleTitle(name, 26)
+	name:SetPoint("CENTER", 0, 1)
+	plate:SetSize(name:GetStringWidth() + 2 * (endWidth + PLATE_PADDING), height)
+	-- Across the window's top edge, standing above it. Offsets here are in the plate's own scale.
+	plate:SetScale(PLATE_SIZE)
+	plate:SetPoint("CENTER", frame, "TOP", 0, 2 / PLATE_SIZE)
+	-- Keeps the plate on screen too when the window is dragged to the top.
+	frame:SetClampRectInsets(0, 0, height * PLATE_SIZE / 2 + 2, 0)
+	return plate
+end
+
 local function CreateConfig()
 	local width, height, maxWidth, maxHeight = GetWindowSize()
 	local frame = W.CreatePanel("DibsUIConfig", UIParent, width, height, ns.TITLE, "PortraitFrameFlatTemplate")
 	frame:SetPortraitToAsset(ns.Media("Logo"))
+	CreateTitlePlate(frame)
 	frame:SetPoint("CENTER")
 	frame:SetFrameStrata("HIGH")
 	frame:SetClampedToScreen(true)
@@ -546,6 +601,7 @@ function ns.RegisterGameSettings()
 	logo:SetPoint("TOPLEFT", 12, -12)
 
 	local title = W.CreateLabel(panel, "GameFontNormalHuge", ns.TITLE)
+	W.StyleTitle(title, 36)
 	title:SetPoint("TOPLEFT", logo, "TOPRIGHT", 12, -6)
 
 	local subtitle = W.CreateLabel(panel, "GameFontHighlight", "")

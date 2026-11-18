@@ -23,7 +23,9 @@ local DROPDOWN_MIN_WIDTH = 100
 local TOGGLE_WIDTH, TOGGLE_HEIGHT = 36, 20
 local KNOB_QUAD, KNOB_TRAVEL = 24, 8
 local TOGGLE_SLIDE_TIME = 0.12
-local TOGGLE_ON = { 1.00, 0.76, 0.10 }
+-- The gold of headings, tab names, buttons and switches: a little softer than the game's own.
+local GOLD = { 0.93, 0.78, 0.26 }
+local TOGGLE_ON = { 0.93, 0.74, 0.24 }
 local TOGGLE_OFF = { 0.30, 0.30, 0.33 }
 
 local LINK_SIZE = 20
@@ -42,7 +44,37 @@ local function FormatPercent(value)
 	return string.format("%d%%", value)
 end
 
+-- The game's gold fonts, recolored with GOLD. Use these names wherever GameFontNormal* would go.
+local GOLD_FONTS = {}
+for name, base in pairs({
+	DibsUIOptionsFontNormal = "GameFontNormal",
+	DibsUIOptionsFontNormalSmall = "GameFontNormalSmall",
+	DibsUIOptionsFontNormalLarge = "GameFontNormalLarge",
+	DibsUIOptionsFontNormalHuge = "GameFontNormalHuge",
+}) do
+	local font = CreateFont(name)
+	font:CopyFontObject(base)
+	font:SetTextColor(GOLD[1], GOLD[2], GOLD[3])
+	GOLD_FONTS[base] = name
+end
+
+-- "DibsUI", larger, in the bundled font: Dibs in shaman blue and UI in gold.
+local TITLE_FONT = ns.Media("Fonts\\BarlowSemiCondensed-Bold.ttf")
+local SHAMAN_BLUE = "0070dd"
+local function StyleTitle(label, size)
+	-- Not every client reports whether SetFont worked, so this checks the font it ended up with.
+	label:SetFont(TITLE_FONT, size, "")
+	if label:GetFont() ~= TITLE_FONT then
+		label:SetFont(STANDARD_TEXT_FONT, size, "")
+	end
+	label:SetShadowOffset(2, -2)
+	label:SetShadowColor(0, 0, 0, 0.9)
+	label:SetText(("|cff%sDibs|r|cff%02x%02x%02xUI|r"):format(SHAMAN_BLUE,
+		math.floor(GOLD[1] * 255 + 0.5), math.floor(GOLD[2] * 255 + 0.5), math.floor(GOLD[3] * 255 + 0.5)))
+end
+
 local function CreateLabel(parent, fontObject, text)
+	fontObject = GOLD_FONTS[fontObject] or fontObject
 	local label = parent:CreateFontString(nil, "OVERLAY", fontObject)
 	label:SetJustifyH("LEFT")
 	label:SetText(text)
@@ -380,7 +412,7 @@ local function CreateButton(parent, text, width)
 	button:SetNormalAtlas(BUTTON_ART.normal)
 	button:SetPushedAtlas("common-button-tertiary-pressed")
 	button:SetDisabledAtlas("common-button-tertiary-disabled")
-	button:SetNormalFontObject(GameFontNormal)
+	button:SetNormalFontObject(DibsUIOptionsFontNormal)
 	button:SetHighlightFontObject(GameFontHighlight)
 	button:SetDisabledFontObject(GameFontDisable)
 	button:SetPushedTextOffset(0, -1)
@@ -749,6 +781,7 @@ ns.Widgets = {
 	DROPDOWN_WIDTH = DROPDOWN_WIDTH,
 	TOGGLE_WIDTH = TOGGLE_WIDTH,
 	TOGGLE_ON = TOGGLE_ON,
+	GOLD = GOLD,
 	TOGGLE_OFF = TOGGLE_OFF,
 
 	FormatScale = FormatScale,
@@ -756,6 +789,7 @@ ns.Widgets = {
 	FormatPercent = FormatPercent,
 
 	CreateLabel = CreateLabel,
+	StyleTitle = StyleTitle,
 	CreateHint = CreateHint,
 	ShowTooltip = ShowTooltip,
 	HideTooltip = HideTooltip,
