@@ -323,14 +323,14 @@ local function CreateTitlePlate(frame)
 		titleText:Hide()
 	end
 
+	-- The plate sits one strata above the window (HIGH), so the window's border can never cover it, and
+	-- the name has its own frame above the plate. Both are fixed, because setting a frame's strata, or
+	-- bringing it to the front, otherwise resets its children too.
 	local plate = CreateFrame("Frame", nil, frame)
-	-- Above the window's border, which the template draws well above the window itself. The border only
-	-- reaches its level after the window is made, so this is set each time the window shows.
-	local function Raise()
-		plate:SetFrameLevel((frame.NineSlice or frame):GetFrameLevel() + 20)
+	plate:SetFrameStrata("DIALOG")
+	if plate.SetFixedFrameStrata then
+		plate:SetFixedFrameStrata(true)
 	end
-	Raise()
-	frame:HookScript("OnShow", Raise)
 	local endWidth, height = PLATE_END * PLATE_SCALE, 40 * PLATE_SCALE
 
 	local function Slice(u0, u1)
@@ -349,7 +349,13 @@ local function CreateTitlePlate(frame)
 	middle:SetPoint("TOPLEFT", left, "TOPRIGHT")
 	middle:SetPoint("BOTTOMRIGHT", right, "BOTTOMLEFT")
 
-	local name = plate:CreateFontString(nil, "OVERLAY")
+	local nameFrame = CreateFrame("Frame", nil, plate)
+	nameFrame:SetAllPoints()
+	nameFrame:SetFrameLevel(plate:GetFrameLevel() + 5)
+	if nameFrame.SetFixedFrameStrata then
+		nameFrame:SetFixedFrameStrata(true)
+	end
+	local name = nameFrame:CreateFontString(nil, "OVERLAY")
 	W.StyleTitle(name, 26)
 	name:SetPoint("CENTER", 0, 1)
 	plate:SetSize(name:GetStringWidth() + 2 * (endWidth + PLATE_PADDING), height)
@@ -365,9 +371,9 @@ local function CreateConfig()
 	local width, height, maxWidth, maxHeight = GetWindowSize()
 	local frame = W.CreatePanel("DibsUIConfig", UIParent, width, height, ns.TITLE, "PortraitFrameFlatTemplate")
 	frame:SetPortraitToAsset(ns.Media("Logo"))
-	CreateTitlePlate(frame)
 	frame:SetPoint("CENTER")
 	frame:SetFrameStrata("HIGH")
+	CreateTitlePlate(frame) -- after the window's strata (see CreateTitlePlate)
 	frame:SetClampedToScreen(true)
 	frame:SetMovable(true)
 	frame:SetResizable(true)

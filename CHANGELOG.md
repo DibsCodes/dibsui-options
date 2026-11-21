@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.4
+
+- The "DibsUI" title plate always stays on top of the settings window's border, instead of sometimes slipping behind it
+
 ## 0.2.3
 
 - "DibsUI" sits on its own plate across the top of the settings window, with Dibs in shaman blue and UI in gold
